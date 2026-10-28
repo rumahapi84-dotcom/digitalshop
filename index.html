@@ -38,8 +38,8 @@
   <header class="glass-effect border-b border-slate-200/80 sticky top-0 z-40 shadow-xs transition-all">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
       
-      <!-- TAJUK KEDAI & BRANDING -->
-      <div class="flex items-center gap-3 cursor-pointer select-none group" onclick="setMode('buyer')">
+      <!-- TAJUK KEDAI & BRANDING (KETUK 3 KALI UNTUK LOG MASUK RAHSIA) -->
+      <div class="flex items-center gap-3 cursor-pointer select-none group" onclick="handleLogoClick()">
         <div id="brand-logo-icon" class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-indigo-300/40 group-hover:scale-105 transition-transform duration-200">
           ⚡
         </div>
@@ -52,7 +52,7 @@
         </div>
       </div>
 
-      <!-- BAHAGIAN KANAN: NO WHATSAPP & PORTAL PENJUAL -->
+      <!-- BAHAGIAN KANAN: NO WHATSAPP & PINTU RAHSIA PENJUAL -->
       <div class="flex items-center gap-2.5 sm:gap-3">
         <span id="live-security-badge" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200/80 shadow-xs">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Mode Live Terjamin (256-bit SSL)
@@ -64,9 +64,8 @@
           <span id="header-wa-text" class="hidden sm:inline">Bantuan WhatsApp</span>
         </a>
 
-        <!-- BUTANG IKON PORTAL PENJUAL (DISKRET & KECIL) -->
-        <button id="btn-mode-seller" onclick="openLoginModal()" title="Tetapan Penjual" class="p-2 text-slate-400 hover:text-slate-700 transition rounded-xl text-sm hover:bg-slate-100 opacity-60 hover:opacity-100 border border-transparent hover:border-slate-200">
-          ⚙️
+        <!-- TITIK MIKRO SAMAR PENJUAL (TIADA IKON GEAR, TIADA TOOLTIP) -->
+        <button id="btn-mode-seller" onclick="openLoginModal()" aria-label="Status" class="w-1.5 h-1.5 rounded-full bg-slate-300 hover:bg-slate-400 opacity-30 hover:opacity-70 transition p-0 m-0 border-0 outline-none focus:outline-none cursor-default ml-1">
         </button>
       </div>
 
@@ -250,6 +249,9 @@
           <button onclick="openSettingsModal()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-md">
             <span>⚙️ Editor & Tetapan Kedai</span>
           </button>
+          <button onclick="handleSellerLogout()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs">
+            <span>🚪</span> Log Keluar
+          </button>
         </div>
       </div>
 
@@ -358,7 +360,7 @@
   <!-- ==================== FOOTER KEDAI PEMBELI ==================== -->
   <footer class="border-t border-slate-200/80 bg-white/70 backdrop-blur-md py-6 text-center text-xs text-slate-500 mt-12">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-      <p id="footer-text">© 2026 Kedai Digital Studio. Hak Cipta Terpelihara. Dikuasakan oleh Sistem E-Dagang Digital.</p>
+      <p id="footer-text">© 2026 Kedai Digital Studio. Hak Cipta Terpelihara<span onclick="openLoginModal()" class="cursor-default select-none text-slate-400/40 hover:text-slate-600 transition-colors">.</span> Dikuasakan oleh Sistem E-Dagang Digital.</p>
       <div class="flex items-center gap-4 text-xs font-medium text-slate-600">
         <span>🔒 Pembayaran FPX Selamat</span>
         <span>⚡ Muat Turun Segera</span>
@@ -386,8 +388,6 @@
           <label class="block text-xs font-bold text-slate-700 mb-1">Kata Laluan (Password)</label>
           <input type="password" id="login-password" required placeholder="••••••••" class="w-full border p-2.5 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
-
-        <p class="text-[10px] text-slate-400 italic">Laluan asal: admin / admin123</p>
 
         <div class="pt-2">
           <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md shadow-indigo-200">
@@ -825,6 +825,25 @@
     let activeCheckoutProduct = null;
     let salesChartInstance = null;
     let activeCategory = 'all';
+    let logoClickCounter = 0;
+    let logoClickTimer = null;
+
+    // FUNGSI LOGO: KETUK 3 KALI UNTUK BUKA MODAL LOGIN PORTAL PENJUAL
+    function handleLogoClick() {
+      logoClickCounter++;
+      clearTimeout(logoClickTimer);
+
+      if (logoClickCounter >= 3) {
+        logoClickCounter = 0;
+        openLoginModal();
+        return;
+      }
+
+      logoClickTimer = setTimeout(() => {
+        logoClickCounter = 0;
+        setMode('buyer');
+      }, 450);
+    }
 
     // STORAN TETAPAN KEDAI LENGKAP (PERSISTED VIA LOCALSTORAGE)
     let storeSettings = {
@@ -923,6 +942,12 @@
       } else {
         toast("❌ Nama pengguna atau kata laluan salah!");
       }
+    }
+
+    function handleSellerLogout() {
+      isSellerLoggedIn = false;
+      setMode('buyer');
+      toast("🔒 Anda telah berjaya log keluar dari Portal Penjual.");
     }
 
     function saveAuthSettings() {
