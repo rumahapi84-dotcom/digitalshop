@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kedai Digital Studio - Pasaran Produk Digital Eksklusif</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js untuk Analisis Jualan -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+  </style>
+</head>
+<body id="app-body" class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white relative overflow-x-hidden">
+
+  <!-- ==================== LATAR BELAKANG AMBIENT GLOW DENGAN MESH GRADIENT ==================== -->
+  <div id="ambient-glow-layer" class="fixed inset-0 pointer-events-none -z-10 overflow-hidden transition-all duration-700">
+    <div id="glow-circle-1" class="absolute -top-40 left-1/2 -translate-x-1/2 w-[45rem] h-[28rem] bg-gradient-to-tr from-indigo-500/15 via-violet-500/15 to-pink-500/10 blur-3xl rounded-full"></div>
+    <div id="glow-circle-2" class="absolute top-[35%] -left-36 w-[30rem] h-[30rem] bg-indigo-500/10 blur-3xl rounded-full"></div>
+    <div id="glow-circle-3" class="absolute top-[65%] -right-36 w-[32rem] h-[32rem] bg-purple-500/10 blur-3xl rounded-full"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] opacity-40"></div>
+  </div>
+
+  <!-- ==================== HEADER UTAMA & TAJUK KEDAI ==================== -->
+  <header class="glass-effect border-b border-slate-200/80 sticky top-0 z-40 shadow-xs transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+      
+      <!-- TAJUK KEDAI & BRANDING -->
+      <div class="flex items-center gap-3 cursor-pointer select-none group" onclick="setMode('buyer')">
+        <div id="brand-logo-icon" class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-indigo-300/40 group-hover:scale-105 transition-transform duration-200">
+          ⚡
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 id="brand-header-title" class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-none group-hover:text-indigo-600 transition-colors">Kedai Digital Studio</h1>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">Rasmi</span>
+          </div>
+          <p id="brand-header-tagline" class="text-[11px] font-medium text-slate-500 mt-1">Pasaran Produk Digital & Templat Terbaik</p>
+        </div>
+      </div>
+
+      <!-- BAHAGIAN KANAN: NO WHATSAPP & PORTAL PENJUAL -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <span id="live-security-badge" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200/80 shadow-xs">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Mode Live Terjamin (256-bit SSL)
+        </span>
+
+        <!-- BUTANG WHATSAPP AUTOMATIK -->
+        <a id="header-wa-btn" href="https://wa.me/60123456789" target="_blank" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all shadow-md shadow-emerald-200 hover:-translate-y-0.5">
+          <span>💬</span>
+          <span id="header-wa-text" class="hidden sm:inline">Bantuan WhatsApp</span>
+        </a>
+
+        <!-- BUTANG IKON PORTAL PENJUAL (DISKRET & KECIL) -->
+        <button id="btn-mode-seller" onclick="openLoginModal()" title="Tetapan Penjual" class="p-2 text-slate-400 hover:text-slate-700 transition rounded-xl text-sm hover:bg-slate-100 opacity-60 hover:opacity-100 border border-transparent hover:border-slate-200">
+          ⚙️
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT AREA ==================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow space-y-8">
+
+    <!-- ==================== PANDANGAN 1: MOD PEMBELI (STOREFRONT) ==================== -->
+    <section id="buyer-view" class="space-y-10">
+      
+      <!-- TOP BANNER HEBAHAN / PROMO BAR -->
+      <div id="buyer-promo-bar" class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white text-xs font-bold py-2.5 px-4 rounded-2xl text-center shadow-md shadow-orange-100 flex items-center justify-center gap-2.5 border border-white/20">
+        <span class="animate-bounce">🔥</span>
+        <span id="buyer-promo-text">TAWARAN ISTIMEWA: Diskaun Sehingga 50% Untuk Semua Ebook & Templat Digital Hari Ini!</span>
+        <span class="hidden sm:inline-block bg-white/20 text-white px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wider">Kod: JIMAT50</span>
+      </div>
+
+      <!-- HERO BANNER STOREFRONT PREMIUM -->
+      <div id="hero-banner" class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-indigo-900 text-white rounded-3xl p-6 sm:p-12 shadow-2xl border border-indigo-700/40">
+        <!-- Glow accents inside hero -->
+        <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute top-0 right-1/4 w-52 h-52 bg-violet-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+          
+          <div class="space-y-4 text-center lg:text-left max-w-2xl">
+            <span id="store-badge-tag" class="inline-flex items-center gap-2 bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 text-xs font-bold px-3.5 py-1.5 rounded-full shadow-xs">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>⚡ Akses & Muat Turun Serta-Merta (Instant Download)</span>
+            </span>
+            <h2 id="store-hero-title" class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
+              Tingkatkan Potensi Bisnes Anda Dengan Bahan Digital Premium
+            </h2>
+            <p id="store-hero-tagline" class="text-indigo-100/90 text-xs sm:text-sm md:text-base leading-relaxed">
+              Koleksi terunggul ebook, fail reka bentuk Canva, preset fotografi dan skrip pemasaran siap guna. Pembayaran terus melalui FPX bank dengan pautan muat turun automatik dihantar ke peranti anda!
+            </p>
+
+            <!-- Mini Bullet Points -->
+            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-1 text-xs text-indigo-200 font-medium">
+              <span class="flex items-center gap-1.5"><span>✅</span> Fail Terus Sah & Berkualiti</span>
+              <span class="flex items-center gap-1.5"><span>✅</span> Tanpa Langganan Bulanan</span>
+              <span class="flex items-center gap-1.5"><span>✅</span> Sokongan Penuh Penjual</span>
+            </div>
+          </div>
+
+          <!-- Hero Search & Action Card -->
+          <div class="w-full lg:w-80 glass-card p-5 rounded-2xl border border-white/20 text-slate-800 shadow-xl space-y-3.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <span>🔍</span> Carian Pantas Fail
+              </span>
+              <span class="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full">Katalog Live</span>
+            </div>
+            <div class="relative">
+              <input type="text" id="buyer-search-input" oninput="filterBuyerProducts()" placeholder="Cari nama ebook, templat..." class="w-full bg-white border border-slate-200 p-3 pl-9 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 outline-none shadow-xs">
+              <span class="absolute left-3 top-3 text-slate-400 text-xs">🔎</span>
+            </div>
+            <p class="text-[10px] text-slate-500 text-center leading-snug">
+              Pilih produk dan nikmati akses segera tanpa menunggu pengesahan manual!
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TRUST BADGES / JAMINAN KESELAMATAN -->
+      <div id="trust-badges-sec" class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        <div class="glass-card p-4 rounded-2xl border border-slate-200/80 text-center shadow-xs hover:shadow-md transition-shadow flex flex-col items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl mb-2">⚡</div>
+          <h5 class="text-xs font-bold text-slate-900">Akses Serta-Merta</h5>
+          <p class="text-[10px] text-slate-500 mt-0.5">Fail terus boleh dimuat turun</p>
+        </div>
+        <div class="glass-card p-4 rounded-2xl border border-slate-200/80 text-center shadow-xs hover:shadow-md transition-shadow flex flex-col items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl mb-2">🔒</div>
+          <h5 class="text-xs font-bold text-slate-900">Bayaran Terjamin</h5>
+          <p class="text-[10px] text-slate-500 mt-0.5">Online FPX & Pindahan Bank</p>
+        </div>
+        <div class="glass-card p-4 rounded-2xl border border-slate-200/80 text-center shadow-xs hover:shadow-md transition-shadow flex flex-col items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl mb-2">💬</div>
+          <h5 class="text-xs font-bold text-slate-900">Sokongan WhatsApp</h5>
+          <p class="text-[10px] text-slate-500 mt-0.5">Bantuan belian pantas & mesra</p>
+        </div>
+        <div class="glass-card p-4 rounded-2xl border border-slate-200/80 text-center shadow-xs hover:shadow-md transition-shadow flex flex-col items-center justify-center">
+          <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl mb-2">⭐</div>
+          <h5 class="text-xs font-bold text-slate-900">Kualiti Terbukti</h5>
+          <p class="text-[10px] text-slate-500 mt-0.5">100% Disahkan & Telah Diuji</p>
+        </div>
+      </div>
+
+      <!-- KATALOG PRODUK PEMBELI -->
+      <div class="space-y-5">
+        
+        <!-- Header Katalog & Filter Kategori -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🛍️</span>
+              <h3 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Katalog Produk Digital Pilihan</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">Dapatkan fail berlesen asli anda hari ini dengan jaminan kepuasan</p>
+          </div>
+
+          <!-- Kategori Tabs -->
+          <div class="flex flex-wrap items-center gap-1.5 text-xs font-bold">
+            <button onclick="filterCategory('all', this)" class="cat-pill px-3 py-1.5 rounded-xl bg-indigo-600 text-white shadow-xs">Semua</button>
+            <button onclick="filterCategory('ebook', this)" class="cat-pill px-3 py-1.5 rounded-xl bg-white text-slate-600 border hover:bg-slate-100">📚 Ebook</button>
+            <button onclick="filterCategory('canva', this)" class="cat-pill px-3 py-1.5 rounded-xl bg-white text-slate-600 border hover:bg-slate-100">🎨 Templat</button>
+            <button onclick="filterCategory('preset', this)" class="cat-pill px-3 py-1.5 rounded-xl bg-white text-slate-600 border hover:bg-slate-100">✨ Presets & Skrip</button>
+          </div>
+        </div>
+
+        <!-- GRID PRODUK PEMBELI -->
+        <div id="buyer-products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <!-- Item dimasukkan dinamik menerusi JS -->
+        </div>
+
+      </div>
+
+      <!-- ==================== SEKSYEN TESTIMONI & ULASAN PELANGGAN ==================== -->
+      <div id="testimonials-section" class="pt-6 space-y-6">
+        
+        <!-- Tajuk Testimoni & Kaunter Statistik -->
+        <div class="text-center space-y-2 max-w-2xl mx-auto">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-black uppercase tracking-wider">
+            ⭐ Dipercayai Ramai Pembeli
+          </span>
+          <h3 class="text-xl sm:text-3xl font-black text-slate-900 tracking-tight" id="testi-header-title">
+            Apa Kata Pelanggan Kami?
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-500" id="testi-header-subtitle">
+            Lihat pengalaman sebenar daripada usahawan dan pereka yang telah memuat turun bahan digital daripada kedai kami.
+          </p>
+        </div>
+
+        <!-- Statistik Ringkas (Social Proof Counters) -->
+        <div class="grid grid-cols-3 gap-3 sm:gap-6 max-w-3xl mx-auto">
+          <div class="glass-card p-3 sm:p-4 rounded-2xl border border-slate-200/80 text-center shadow-xs">
+            <span id="stat-rating-val" class="text-lg sm:text-2xl font-black text-indigo-600 block">4.9 / 5.0</span>
+            <span class="text-[10px] sm:text-xs text-slate-500 font-semibold">Skor Penarafan</span>
+          </div>
+          <div class="glass-card p-3 sm:p-4 rounded-2xl border border-slate-200/80 text-center shadow-xs">
+            <span id="stat-downloads-val" class="text-lg sm:text-2xl font-black text-emerald-600 block">3,800+</span>
+            <span class="text-[10px] sm:text-xs text-slate-500 font-semibold">Fail Dimuat Turun</span>
+          </div>
+          <div class="glass-card p-3 sm:p-4 rounded-2xl border border-slate-200/80 text-center shadow-xs">
+            <span id="stat-satisfaction-val" class="text-lg sm:text-2xl font-black text-amber-500 block">99.8%</span>
+            <span class="text-[10px] sm:text-xs text-slate-500 font-semibold">Pelanggan Puas Hati</span>
+          </div>
+        </div>
+
+        <!-- Kad-Kad Testimoni (3 Ulasan Dinamik) -->
+        <div id="testimonials-grid" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Kad dimasukkan dinamik menerusi JS -->
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==================== PANDANGAN 2: MOD PORTAL PENJUAL ==================== -->
+    <section id="seller-view" class="hidden space-y-6">
+      
+      <!-- SUB-HEADER PENJUAL & BUTANG KELUAR -->
+      <div class="glass-card p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow-md shadow-indigo-200">
+            📊
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Portal Pengurusan Penjual</h2>
+            <p class="text-xs text-slate-500" id="seller-email-status">Akaun: admin@kedaidigital.com (Pemilik Sah Kedai)</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="setMode('buyer')" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-xs">
+            ⬅️ Kembali ke Kedai Pembeli
+          </button>
+          <button onclick="openSettingsModal()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-md">
+            <span>⚙️ Editor & Tetapan Kedai</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- SECURITY NOTICE BOX -->
+      <div class="bg-amber-50/90 border border-amber-200 p-4 rounded-2xl text-xs text-amber-900 flex items-start gap-3">
+        <span class="text-xl">🛡️</span>
+        <div>
+          <h4 class="font-bold">Panduan Keselamatan & Pembayaran Kedai:</h4>
+          <p class="text-[11px] text-amber-800 mt-0.5">
+            Duit jualan daripada pembeli akan disalurkan mengikut tetapan di bahagian <strong>Tetapan Kedai (⚙️)</strong>. Bagi pembayaran FPX ToyyibPay/Billplz, pastikan anda mengisi pautan bil direct ataupun maklumat akaun bank dengan tepat.
+          </p>
+        </div>
+      </div>
+
+      <!-- GRID UTAMA PENJUAL: BORANG UPLOAD/EDIT & SENARAI PRODUK -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- BORANG TAMBAH / SUNTING PRODUK -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-4 lg:col-span-1">
+          <div class="border-b pb-3 flex items-center justify-between">
+            <h3 id="form-header-title" class="font-bold text-sm text-slate-900 flex items-center gap-2">
+              <span>➕</span> Tambah Produk Digital
+            </h3>
+            <span id="form-badge" class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full">Borang Baru</span>
+          </div>
+
+          <form id="upload-form" onsubmit="handleProductUpload(event)" class="space-y-3.5">
+            <input type="hidden" id="p-edit-id" value="">
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Tajuk Produk</label>
+              <input type="text" id="p-title" required placeholder="Contoh: Ebook Panduan Bisnes 2026" class="w-full border p-2.5 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Kategori Produk</label>
+              <select id="p-category" class="w-full border p-2.5 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500 bg-white font-medium">
+                <option value="ebook">📚 Ebook & Panduan PDF</option>
+                <option value="canva">🎨 Templat Canva / Reka Bentuk</option>
+                <option value="preset">✨ Preset Lightroom / Skrip FB Ads</option>
+                <option value="software">💾 Perisian / Tool Digital</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Harga (RM)</label>
+              <input type="number" step="0.01" id="p-price" required placeholder="29.00" class="w-full border p-2.5 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <!-- RUANGAN PAUTAN DIRECT PAYMENT GATEWAY (TOYYIBPAY / BILLPLZ) -->
+            <div>
+              <label class="block text-xs font-bold text-indigo-700 mb-1">🔗 Pautan Bayaran Direct FPX (ToyyibPay / Billplz Link)</label>
+              <input type="url" id="p-payment-link" placeholder="https://toyyibpay.com/Nama-Bil-Anda" class="w-full border border-indigo-200 bg-indigo-50/40 p-2.5 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+              <span class="text-[10px] text-slate-400 mt-0.5 block">Jika dimasukkan, pembeli menekan 'Beli' akan terus dibawa ke gerbang pembayaran bank secara direct.</span>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Penerangan Ringkas</label>
+              <textarea id="p-desc" rows="2" placeholder="Penerangan menarik ringkas berkenaan fail digital ini..." class="w-full border p-2.5 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Gambar Cover (JPG/PNG)</label>
+              <input type="file" id="p-image" accept="image/*" class="w-full border p-2 rounded-xl text-xs bg-slate-50">
+              <span id="p-image-hint" class="text-[10px] text-slate-400 hidden">Biarkan kosong jika tidak mahu tukar gambar sedia ada</span>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Fail Digital Untuk Pembeli (PDF/ZIP)</label>
+              <input type="file" id="p-file" accept=".pdf,.zip,.rar,.docx" class="w-full border p-2 rounded-xl text-xs bg-slate-50">
+              <span id="p-file-hint" class="text-[10px] text-slate-400 hidden">Biarkan kosong jika tidak mahu tukar fail sedia ada</span>
+            </div>
+
+            <div class="flex flex-col gap-2 pt-1">
+              <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md shadow-indigo-200">
+                🚀 Muat Naik Produk Ke Storefront
+              </button>
+              <button type="button" id="cancel-edit-btn" onclick="resetProductForm()" class="hidden w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-xl text-xs transition">
+                ❌ Batal Edit
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- SENARAI PRODUK UNTUK DIPADAM / DIURUS / DIEDIT -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-4 lg:col-span-2">
+          <div class="border-b pb-3 flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2">
+                <span>📦</span> Senarai Produk Dalam Kedai
+              </h3>
+              <p class="text-[11px] text-slate-400">Kemas kini harga/maklumat atau padam produk sedia ada</p>
+            </div>
+          </div>
+
+          <div id="seller-products-list" class="space-y-3">
+            <!-- Produk Penjual dimasukkan menerusi JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FOOTER KEDAI PEMBELI ==================== -->
+  <footer class="border-t border-slate-200/80 bg-white/70 backdrop-blur-md py-6 text-center text-xs text-slate-500 mt-12">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p id="footer-text">© 2026 Kedai Digital Studio. Hak Cipta Terpelihara. Dikuasakan oleh Sistem E-Dagang Digital.</p>
+      <div class="flex items-center gap-4 text-xs font-medium text-slate-600">
+        <span>🔒 Pembayaran FPX Selamat</span>
+        <span>⚡ Muat Turun Segera</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL LOG IN PENJUAL (PASSWORD & USERNAME) ==================== -->
+  <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-100 text-left">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🔐</span>
+          <h3 class="text-sm font-bold text-slate-900">Log Masuk Portal Penjual</h3>
+        </div>
+        <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg leading-none">&times;</button>
+      </div>
+
+      <form onsubmit="handleSellerLogin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Pengguna (Username)</label>
+          <input type="text" id="login-username" required placeholder="admin" class="w-full border p-2.5 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Kata Laluan (Password)</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="w-full border p-2.5 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <p class="text-[10px] text-slate-400 italic">Laluan asal: admin / admin123</p>
+
+        <div class="pt-2">
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md shadow-indigo-200">
+            🔓 Masuk Portal
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL POP-UP TETAPAN UTAMA & EDITOR WEBSITE (⚙️) ==================== -->
+  <div id="settings-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-hidden shadow-2xl flex flex-col border border-slate-100">
+      
+      <!-- MODAL HEADER -->
+      <div class="p-5 border-b bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">⚙️</span>
+          <div>
+            <h3 class="text-base font-bold">Pusat Kawalan & Editor Lengkap Kedai</h3>
+            <p class="text-xs text-slate-400">Kemaskini Tema, Latar Belakang, Testimoni, Pembayaran & WhatsApp</p>
+          </div>
+        </div>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white font-bold text-2xl leading-none">&times;</button>
+      </div>
+
+      <!-- MODAL TABS NAVIGATION -->
+      <div class="flex overflow-x-auto border-b bg-slate-50 p-2 gap-1 text-xs font-bold text-slate-600">
+        <button onclick="switchTab('sec-storefront', this)" class="tab-btn bg-white text-indigo-600 border px-4 py-2 rounded-xl shadow-xs">🎨 Editor & Tema Website</button>
+        <button onclick="switchTab('sec-testimonials-edit', this)" class="tab-btn px-4 py-2 rounded-xl hover:bg-white">⭐ Sunting Testimoni</button>
+        <button onclick="switchTab('sec-payment', this)" class="tab-btn px-4 py-2 rounded-xl hover:bg-white">💳 Payment Gateway & Bank</button>
+        <button onclick="switchTab('sec-whatsapp', this)" class="tab-btn px-4 py-2 rounded-xl hover:bg-white">💬 WhatsApp & Laluan</button>
+        <button onclick="switchTab('sec-analytics', this)" class="tab-btn px-4 py-2 rounded-xl hover:bg-white">📊 Analisis Jualan</button>
+      </div>
+
+      <!-- MODAL CONTENT BODY -->
+      <div class="p-6 overflow-y-auto flex-1 space-y-6">
+
+        <!-- TAB 1: EDITOR STOREFRONT & TEMA LATAR BELAKANG -->
+        <div id="sec-storefront" class="tab-content space-y-6">
+          
+          <!-- Pilihan Tema Warna & Background Glow -->
+          <div class="bg-indigo-50/60 p-4 rounded-2xl border border-indigo-100 space-y-3">
+            <h4 class="font-bold text-xs uppercase tracking-wider text-indigo-900 flex items-center gap-2">
+              <span>🌈</span> Pilihan Latar Belakang & Gaya Kedai (Background Theme)
+            </h4>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center bg-white hover:border-indigo-500 transition flex flex-col items-center gap-1.5 has-[:checked]:border-indigo-600 has-[:checked]:ring-2 has-[:checked]:ring-indigo-100">
+                <input type="radio" name="theme-radio" value="theme-indigo" checked class="hidden">
+                <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500"></span>
+                <span class="text-[11px] font-bold text-slate-800">Indigo Modern</span>
+              </label>
+              <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center bg-white hover:border-emerald-500 transition flex flex-col items-center gap-1.5 has-[:checked]:border-emerald-600 has-[:checked]:ring-2 has-[:checked]:ring-emerald-100">
+                <input type="radio" name="theme-radio" value="theme-emerald" class="hidden">
+                <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500"></span>
+                <span class="text-[11px] font-bold text-slate-800">Luxury Emerald</span>
+              </label>
+              <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center bg-white hover:border-rose-500 transition flex flex-col items-center gap-1.5 has-[:checked]:border-rose-600 has-[:checked]:ring-2 has-[:checked]:ring-rose-100">
+                <input type="radio" name="theme-radio" value="theme-rose" class="hidden">
+                <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-rose-600 to-amber-500"></span>
+                <span class="text-[11px] font-bold text-slate-800">Royal Rose</span>
+              </label>
+              <label class="cursor-pointer border-2 rounded-xl p-2.5 text-center bg-white hover:border-slate-800 transition flex flex-col items-center gap-1.5 has-[:checked]:border-slate-800 has-[:checked]:ring-2 has-[:checked]:ring-slate-300">
+                <input type="radio" name="theme-radio" value="theme-dark" class="hidden">
+                <span class="w-6 h-6 rounded-full bg-gradient-to-tr from-slate-900 to-slate-700"></span>
+                <span class="text-[11px] font-bold text-slate-800">Midnight Dark</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Penjenamaan & Bar Promosi -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-3 bg-slate-50 p-4 rounded-2xl border">
+              <h4 class="font-bold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                <span>🏷️</span> Penjenamaan Kedai
+              </h4>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Kedai Digital</label>
+                <input type="text" id="site-name" value="Kedai Digital Studio" class="w-full border p-2.5 rounded-xl text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Slogan Header</label>
+                <input type="text" id="site-tagline" value="Pasaran Produk Digital & Templat Terbaik" class="w-full border p-2.5 rounded-xl text-xs bg-white">
+              </div>
+            </div>
+
+            <div class="space-y-3 bg-slate-50 p-4 rounded-2xl border">
+              <h4 class="font-bold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                <span>🔥</span> Bar Hebahan Promosi
+              </h4>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Teks Bar Promosi Atas</label>
+                <input type="text" id="promo-text-input" value="TAWARAN ISTIMEWA: Diskaun Sehingga 50% Untuk Semua Ebook & Templat Digital Hari Ini!" class="w-full border p-2.5 rounded-xl text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Lencana Kecil Hero Banner</label>
+                <input type="text" id="hero-badge-input" value="⚡ Akses & Muat Turun Serta-Merta (Instant Download)" class="w-full border p-2.5 rounded-xl text-xs bg-white">
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero Banner Content -->
+          <div class="space-y-3 bg-slate-50 p-4 rounded-2xl border">
+            <h4 class="font-bold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+              <span>🚀</span> Kandungan Hero Banner Utama
+            </h4>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Tajuk Utama Hero</label>
+              <input type="text" id="hero-title-input" value="Tingkatkan Potensi Bisnes Anda Dengan Bahan Digital Premium" class="w-full border p-2.5 rounded-xl text-xs bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Penerangan / Subtitle Hero</label>
+              <textarea id="hero-desc-input" rows="2" class="w-full border p-2.5 rounded-xl text-xs bg-white">Koleksi terunggul ebook, fail reka bentuk Canva, preset fotografi dan skrip pemasaran siap guna. Pembayaran terus melalui FPX bank dengan pautan muat turun automatik dihantar ke peranti anda!</textarea>
+            </div>
+          </div>
+
+          <!-- Kaunter Statistik Keyakinan -->
+          <div class="space-y-3 bg-slate-50 p-4 rounded-2xl border">
+            <h4 class="font-bold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+              <span>📊</span> Statistik Keyakinan (Social Proof Counters)
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Skor Rating (Cth: 4.9 / 5.0)</label>
+                <input type="text" id="stat-rating-input" value="4.9 / 5.0" class="w-full border p-2 rounded-xl text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Jumlah Muat Turun (Cth: 3,800+)</label>
+                <input type="text" id="stat-downloads-input" value="3,800+" class="w-full border p-2 rounded-xl text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Kadar Kepuasan (Cth: 99.8%)</label>
+                <input type="text" id="stat-satisfaction-input" value="99.8%" class="w-full border p-2 rounded-xl text-xs bg-white">
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button onclick="applyStorefrontSettings()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs shadow-md shadow-indigo-200 transition">
+              💾 Simpan Rekabentuk & Tema Kedai
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB 2: EDITOR TESTIMONI (3 ULASAN BOLEH DIEDIT SEPENUHNYA) -->
+        <div id="sec-testimonials-edit" class="tab-content hidden space-y-5">
+          <div class="bg-amber-50 border border-amber-200 p-3.5 rounded-2xl text-xs text-amber-900 flex items-center gap-2">
+            <span>💡</span>
+            <span>Anda boleh mengemas kini nama, bisnes, ulasan serta bintang bagi 3 kad testimoni yang dipaparkan kepada pembeli.</span>
+          </div>
+
+          <!-- Testimoni 1 -->
+          <div class="bg-slate-50 p-4 rounded-2xl border space-y-3">
+            <div class="flex items-center justify-between border-b pb-2">
+              <span class="text-xs font-black text-indigo-900">Ulasan Pelanggan #1</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Aktif</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Nama Pembeli</label>
+                <input type="text" id="t-name-1" value="Muhammad Irfan" class="w-full border p-2 rounded-xl text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Pekerjaan / Bisnes</label>
+                <input type="text" id="t-role-1" value="Usahawan E-Dagang & TikTok Shop" class="w-full border p-2 rounded-xl text-xs bg-white">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Teks Komen / Ulasan</label>
+              <textarea id="t-text-1" rows="2" class="w-full border p-2 rounded-xl text-xs bg-white">Ebook dan templat ini sangat berbaloi! Selepas buat bayaran, terus dapat link download PDF dan fail Canva. Sangat pantas dan copywriting memang berkualiti!</textarea>
+            </div>
+          </div>
+
+          <!-- Testimoni 2 -->
+          <div class="bg-slate-50 p-4 rounded-2xl border space-y-3">
+            <div class="flex items-center justify-between border-b pb-2">
+              <span class="text-xs font-black text-indigo-900">Ulasan Pelanggan #2</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Aktif</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Nama Pembeli</label>
+                <input type="text" id="t-name-2" value="Nur Sarah Farhana" class="w-full border p-2 rounded-xl text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Pekerjaan / Bisnes</label>
+                <input type="text" id="t-role-2" value="Pereka Grafik Bebas (Freelancer)" class="w-full border p-2 rounded-xl text-xs bg-white">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Teks Komen / Ulasan</label>
+              <textarea id="t-text-2" rows="2" class="w-full border p-2 rounded-xl text-xs bg-white">Templat Canva sangat mudah diedit dan presets Lightroom dia menjimatkan masa editing berjam-jam. Recommended 100% untuk sesiapa yang berniaga online.</textarea>
+            </div>
+          </div>
+
+          <!-- Testimoni 3 -->
+          <div class="bg-slate-50 p-4 rounded-2xl border space-y-3">
+            <div class="flex items-center justify-between border-b pb-2">
+              <span class="text-xs font-black text-indigo-900">Ulasan Pelanggan #3</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Aktif</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Nama Pembeli</label>
+                <input type="text" id="t-name-3" value="Azman Hakimi" class="w-full border p-2 rounded-xl text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Pekerjaan / Bisnes</label>
+                <input type="text" id="t-role-3" value="Pengasas Bisnes Digital" class="w-full border p-2 rounded-xl text-xs bg-white">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Teks Komen / Ulasan</label>
+              <textarea id="t-text-3" rows="2" class="w-full border p-2 rounded-xl text-xs bg-white">Proses pembelian sangat lancar, tak perlu tunggu lama untuk dapatkan akses. Layanan WhatsApp pun pantas bila saya tanya soalan teknikal. Terbaik!</textarea>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button onclick="saveTestimonialSettings()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs shadow-md transition">
+              💾 Simpan Maklumat Testimoni
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB 3: PAYMENT GATEWAY & AKAUN BANK -->
+        <div id="sec-payment" class="tab-content hidden space-y-4">
+          <div class="bg-indigo-50 border border-indigo-100 p-3.5 rounded-2xl text-xs text-indigo-900 space-y-1">
+            <div class="font-bold flex items-center gap-1.5">💡 Cara Direct Transfer (FPX Automatic Redirect)</div>
+            <p class="text-[11px] leading-relaxed">
+              • <strong>Direct FPX Link (ToyyibPay / Billplz):</strong> Apabila anda masukkan pautan bil ToyyibPay/Billplz di borang produk, pembeli yang menekan butang <strong>Beli</strong> akan terus dibawa ke muka surat FPX Online Banking bank pilihan mereka secara automatic.<br>
+              • <strong>Manual Transfer / DuitNow QR:</strong> Digunakan sebagai sandaran (fallback) jika pautan direct belum dimasukkan.
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Kaedah Utama Pembayaran Kedai</label>
+            <select id="pg-provider" onchange="renderPgFields()" class="w-full border p-2.5 rounded-xl text-xs bg-white font-bold">
+              <option value="direct_link" selected>Direct FPX Gateway Link (ToyyibPay / Billplz Link)</option>
+              <option value="manual">Manual Transfer Bank / DuitNow QR</option>
+            </select>
+          </div>
+          <div id="pg-fields" class="space-y-3 pt-2"></div>
+          
+          <button onclick="savePaymentGatewaySettings()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">
+            💾 Simpan Tetapan Pembayaran & Bank
+          </button>
+        </div>
+
+        <!-- TAB 4: WHATSAPP AUTO & KATA LALUAN -->
+        <div id="sec-whatsapp" class="tab-content hidden space-y-4">
+          <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-2xl text-xs text-emerald-900 flex items-center gap-2">
+            <span>✅</span>
+            <span>Nombor yang dimasukkan di sini akan terus mengemaskini pautan WhatsApp di header laman web secara automatik.</span>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Nombor WhatsApp Kedai (Format: 60123456789)</label>
+            <input type="text" id="wa-number" value="60123456789" placeholder="60123456789" class="w-full border p-2.5 rounded-xl text-xs bg-white">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Mesej Templat Laluan Sokongan WhatsApp</label>
+            <textarea id="wa-template-msg" rows="3" class="w-full border p-2.5 rounded-xl text-xs bg-white">Salam Admin, saya membuat pembelian di Kedai Digital Studio dan perlukan bantuan sokongan teknikal mengenai produk digital saya.</textarea>
+          </div>
+          <button onclick="saveWhatsAppSettings()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">
+            💾 Simpan Nombor WhatsApp Kedai
+          </button>
+          
+          <div class="border-t pt-4 mt-4 space-y-3">
+            <h4 class="font-bold text-xs text-slate-800 flex items-center gap-1.5">🔑 Tukar Kata Laluan Portal Penjual</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Username Baru</label>
+                <input type="text" id="setting-username" class="w-full border p-2 rounded-xl text-xs bg-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Password Baru</label>
+                <input type="password" id="setting-password" class="w-full border p-2 rounded-xl text-xs bg-white">
+              </div>
+            </div>
+            <button onclick="saveAuthSettings()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-2 rounded-xl text-xs transition">
+              💾 Kemaskini Kata Laluan
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB 5: ANALISIS & GRAF -->
+        <div id="sec-analytics" class="tab-content hidden space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
+              <span class="text-xs text-emerald-600 font-bold uppercase">Jumlah Jualan</span>
+              <h3 class="text-xl font-black text-emerald-900 mt-1">RM 1,450.00</h3>
+            </div>
+            <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-100">
+              <span class="text-xs text-indigo-600 font-bold uppercase">Pesanan Berjaya</span>
+              <h3 class="text-xl font-black text-indigo-900 mt-1">48 Pesanan</h3>
+            </div>
+            <div class="bg-amber-50 p-4 rounded-2xl border border-amber-100">
+              <span class="text-xs text-amber-600 font-bold uppercase">Kadar Konversi</span>
+              <h3 class="text-xl font-black text-amber-900 mt-1">4.2%</h3>
+            </div>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-2xl border h-64">
+            <canvas id="salesChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL POP-UP CHECKOUT & PEMILIHAN BANK ==================== -->
+  <div id="demo-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 border border-slate-100 text-left max-h-[90vh] overflow-y-auto">
+      
+      <!-- HEADER MODAL CHECKOUT -->
+      <div class="flex items-center justify-between border-b pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg font-bold">
+            🛍️
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Pembayaran & Akses Fail Segera</h3>
+            <p class="text-[11px] text-slate-400">Pilih bank, teruskan bayaran & muat turun fail serta-merta</p>
+          </div>
+        </div>
+        <button onclick="closeDemoModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl leading-none">&times;</button>
+      </div>
+
+      <!-- RINGKASAN PRODUK TERPILIH -->
+      <div class="bg-indigo-50/70 border border-indigo-100 p-4 rounded-2xl flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block">Produk Terpilih:</span>
+          <h4 id="demo-product-title" class="text-xs sm:text-sm font-bold text-slate-900">Ebook Asas Niaga Digital 2026</h4>
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] text-slate-400 block">Jumlah Bayaran:</span>
+          <span id="demo-product-price" class="text-base font-black text-indigo-700">RM 29.00</span>
+        </div>
+      </div>
+
+      <!-- MAKLUMAT PEMBELI -->
+      <div class="space-y-3">
+        <h5 class="text-xs font-bold text-slate-800 flex items-center gap-1">
+          <span>👤</span> Maklumat Pembeli (Bagi Akses Fail & Resit Rasmi)
+        </h5>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <input type="text" id="checkout-buyer-name" placeholder="Nama Penuh Anda" class="w-full border p-2.5 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50">
+          <input type="email" id="checkout-buyer-email" placeholder="Alamat Emel Anda" class="w-full border p-2.5 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50">
+        </div>
+      </div>
+
+      <!-- SEKSYEN PINDAHAN BANK (8 BANK MALAYSIA) -->
+      <div class="space-y-3">
+        <h5 class="text-xs font-bold text-slate-800 flex items-center gap-1">
+          <span>🏦</span> Pilih Bank Anda (8 Bank Utama Malaysia)
+        </h5>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 mb-1">Pilih Bank Pembeli:</label>
+          <select id="checkout-bank-select" class="w-full border p-2.5 rounded-xl text-xs bg-white font-bold outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="" disabled selected>-- Pilih Bank Digunakan --</option>
+            <option value="Maybank (Maybank2u)">1. Maybank (Maybank2u)</option>
+            <option value="CIMB Bank (CIMB Clicks)">2. CIMB Bank (CIMB Clicks)</option>
+            <option value="Public Bank (PBe)">3. Public Bank (PBe)</option>
+            <option value="RHB Bank (RHB Now)">4. RHB Bank (RHB Now)</option>
+            <option value="Hong Leong Bank (HLB Connect)">5. Hong Leong Bank (HLB Connect)</option>
+            <option value="Bank Islam Malaysia">6. Bank Islam Malaysia</option>
+            <option value="AmBank Malaysia">7. AmBank Malaysia</option>
+            <option value="Bank Simpanan Nasional (BSN)">8. Bank Simpanan Nasional (BSN)</option>
+          </select>
+        </div>
+
+        <!-- MAKLUMAT AKAUN BANK PENJUAL -->
+        <div class="bg-amber-50 border border-amber-200 p-3 rounded-2xl text-xs text-amber-900 space-y-1">
+          <span class="font-bold block text-[11px] uppercase tracking-wider">Akaun Penerima (Penjual):</span>
+          <p class="font-bold text-slate-800" id="checkout-seller-bank-info">Maybank: 564012345678 (Kedai Digital Studio)</p>
+          <p class="text-[10px] text-amber-700">DuitNow QR / HP: <span id="checkout-seller-qr-info">60123456789</span></p>
+        </div>
+      </div>
+
+      <!-- SEKSYEN KEJAYAAN / MUAT TURUN & RESIT EMEL -->
+      <div id="checkout-result-box" class="hidden space-y-3">
+        <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl text-center space-y-3">
+          <span class="text-3xl">🎉</span>
+          <h4 class="text-xs font-bold text-emerald-900">Pembayaran Disahkan!</h4>
+          
+          <!-- MUAT TURUN TERUS -->
+          <div class="bg-white p-3 rounded-xl border border-emerald-200 space-y-2">
+            <span class="text-[11px] font-bold text-slate-700 block">Akses Pautan Produk Digital Anda:</span>
+            <a id="demo-download-link" href="#" target="_blank" download class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-sm">
+              <span>📥</span> <span id="demo-download-text">Muat Turun Fail Digital</span>
+            </a>
+          </div>
+
+          <!-- NOTIFIKASI HANTAR KE EMEL -->
+          <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-200 text-left text-xs text-indigo-900 space-y-1">
+            <div class="font-bold flex items-center gap-1 text-[11px]">
+              <span>✉️</span> Resit & Pautan Dihantar Ke Emel:
+            </div>
+            <p id="email-confirmation-text" class="text-[10px] font-mono text-indigo-700 break-all">pembeli@gmail.com</p>
+            <p class="text-[9px] text-indigo-500">Sistem telah mengesahkan transaksi bayaran dan menghantar akses fail terus ke peti masuk emel pembeli.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUTANG PROSES BAYARAN -->
+      <div id="checkout-actions" class="flex flex-col gap-2 pt-2">
+        <button id="btn-process-payment" onclick="processCheckoutPayment()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md shadow-indigo-200 flex items-center justify-center gap-2">
+          <span>⚡</span> Bayar & Muat Turun Serta-Merta
+        </button>
+        <button onclick="closeDemoModal()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2 rounded-xl text-xs transition">
+          Batal Pembelian
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl text-xs font-bold hidden z-50 transition-all flex items-center gap-2">
+    <span>✨</span> <span id="toast-text">Notifikasi</span>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    // DATA MOCK PRODUK DENGAN KATEGORI & TAG
+    let productsList = [
+      { id: 1, title: 'Ebook Asas Niaga Digital 2026', category: 'ebook', price: 29.00, payment_link: '', description: 'Panduan lengkap membina kedai digital automatik dari asas sehingga jualan pertama.', image_url: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500', file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
+      { id: 2, title: 'Templat Canva Marketing Kit (50+ Design)', category: 'canva', price: 15.00, payment_link: '', description: '50+ Reka bentuk iklan media sosial profesional sedia sunting untuk promosi diskaun.', image_url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500', file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
+      { id: 3, title: 'Koleksi Presets Lightroom Studio Pro', category: 'preset', price: 25.00, payment_link: '', description: '10 Presets premium untuk penyuntingan gambar produk yang tajam dan berkualiti tinggi.', image_url: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=500', file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
+      { id: 4, title: 'Skrip & Blueprint FB Ads High Conversion', category: 'preset', price: 49.00, payment_link: '', description: 'Templat ayat jualan (copywriting) dan struktur sasaran penonton iklan berkesan.', image_url: 'https://images.unsplash.com/photo-1533750349077-cdcd1ec5f703?w=500', file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
+    ];
+
+    let currentMode = 'buyer';
+    let isSellerLoggedIn = false;
+    let activeCheckoutProduct = null;
+    let salesChartInstance = null;
+    let activeCategory = 'all';
+
+    // STORAN TETAPAN KEDAI LENGKAP (PERSISTED VIA LOCALSTORAGE)
+    let storeSettings = {
+      sellerUsername: 'admin',
+      sellerPassword: 'admin123',
+      waNumber: '60123456789',
+      waMsg: 'Salam Admin, saya membuat pembelian di Kedai Digital Studio dan perlukan bantuan sokongan teknikal mengenai produk digital saya.',
+      bankName: 'Maybank Berhad',
+      bankAcc: '564012345678',
+      bankHolder: 'Kedai Digital Studio Enterprise',
+      duitnow: '60123456789',
+      provider: 'direct_link',
+      themeStyle: 'theme-indigo',
+      siteName: 'Kedai Digital Studio',
+      siteTagline: 'Pasaran Produk Digital & Templat Terbaik',
+      promoText: 'TAWARAN ISTIMEWA: Diskaun Sehingga 50% Untuk Semua Ebook & Templat Digital Hari Ini!',
+      heroBadge: '⚡ Akses & Muat Turun Serta-Merta (Instant Download)',
+      heroTitle: 'Tingkatkan Potensi Bisnes Anda Dengan Bahan Digital Premium',
+      heroDesc: 'Koleksi terunggul ebook, fail reka bentuk Canva, preset fotografi dan skrip pemasaran siap guna. Pembayaran terus melalui FPX bank dengan pautan muat turun automatik dihantar ke peranti anda!',
+      statRating: '4.9 / 5.0',
+      statDownloads: '3,800+',
+      statSatisfaction: '99.8%',
+      // 3 Testimoni Pelanggan
+      testimonials: [
+        {
+          name: 'Muhammad Irfan',
+          role: 'Usahawan E-Dagang & TikTok Shop',
+          text: 'Ebook dan templat ini sangat berbaloi! Selepas buat bayaran, terus dapat link download PDF dan fail Canva. Sangat pantas dan copywriting memang berkualiti!',
+          stars: 5,
+          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'
+        },
+        {
+          name: 'Nur Sarah Farhana',
+          role: 'Pereka Grafik Bebas (Freelancer)',
+          text: 'Templat Canva sangat mudah diedit dan presets Lightroom dia menjimatkan masa editing berjam-jam. Recommended 100% untuk sesiapa yang berniaga online.',
+          stars: 5,
+          avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'
+        },
+        {
+          name: 'Azman Hakimi',
+          role: 'Pengasas Bisnes Digital',
+          text: 'Proses pembelian sangat lancar, tak perlu tunggu lama untuk dapatkan akses. Layanan WhatsApp pun pantas bila saya tanya soalan teknikal. Terbaik!',
+          stars: 5,
+          avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150'
+        }
+      ]
+    };
+
+    // LOGIK MOD KEDAI (PEMBELI vs PENJUAL)
+    function setMode(mode) {
+      currentMode = mode;
+      const buyerSec = document.getElementById('buyer-view');
+      const sellerSec = document.getElementById('seller-view');
+
+      if (mode === 'buyer') {
+        buyerSec.classList.remove('hidden');
+        sellerSec.classList.add('hidden');
+        renderBuyerProducts();
+        renderTestimonials();
+      } else {
+        buyerSec.classList.add('hidden');
+        sellerSec.classList.remove('hidden');
+        renderSellerProducts();
+      }
+    }
+
+    // MODAL LOG MASUK PENJUAL
+    function openLoginModal() {
+      if (isSellerLoggedIn && currentMode === 'seller') {
+        setMode('buyer');
+        return;
+      }
+      if (isSellerLoggedIn) {
+        setMode('seller');
+        return;
+      }
+      document.getElementById('login-username').value = '';
+      document.getElementById('login-password').value = '';
+      document.getElementById('login-modal').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('login-modal').classList.add('hidden');
+    }
+
+    function handleSellerLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('login-username').value.trim();
+      const pass = document.getElementById('login-password').value.trim();
+
+      if (user === storeSettings.sellerUsername && pass === storeSettings.sellerPassword) {
+        isSellerLoggedIn = true;
+        closeLoginModal();
+        setMode('seller');
+        toast("🔓 Berjaya log masuk ke Portal Penjual!");
+      } else {
+        toast("❌ Nama pengguna atau kata laluan salah!");
+      }
+    }
+
+    function saveAuthSettings() {
+      const newUser = document.getElementById('setting-username').value.trim();
+      const newPass = document.getElementById('setting-password').value.trim();
+
+      if (!newUser || !newPass) {
+        toast("⚠️ Sila isi kedua-dua ruangan username & password baru!");
+        return;
+      }
+
+      storeSettings.sellerUsername = newUser;
+      storeSettings.sellerPassword = newPass;
+      localStorage.setItem('kda_digital_settings', JSON.stringify(storeSettings));
+      toast("🔑 Akses keselamatan Portal Penjual berjaya dikemaskini!");
+    }
+
+    // STORAN TETAPAN & WHATSAPP
+    function loadSavedSettings() {
+      const saved = localStorage.getItem('kda_digital_settings');
+      if (saved) {
+        try { storeSettings = Object.assign(storeSettings, JSON.parse(saved)); } catch(e){}
+      }
+      const savedProducts = localStorage.getItem('kda_digital_products');
+      if (savedProducts) {
+        try { productsList = JSON.parse(savedProducts); } catch(e){}
+      }
+
+      applyThemeStyle(storeSettings.themeStyle || 'theme-indigo');
+      updateStorefrontDOM();
+      updateWaHeaderBtn();
+
+      // Set input keselamatan dalam modal tetapan
+      if (document.getElementById('setting-username')) document.getElementById('setting-username').value = storeSettings.sellerUsername;
+      if (document.getElementById('setting-password')) document.getElementById('setting-password').value = storeSettings.sellerPassword;
+    }
+
+    function updateWaHeaderBtn() {
+      const cleanWa = storeSettings.waNumber.replace(/[^0-9]/g, '');
+      const waBtn = document.getElementById('header-wa-btn');
+      if (waBtn) {
+        waBtn.href = `https://wa.me/${cleanWa}?text=${encodeURIComponent(storeSettings.waMsg)}`;
+      }
+      const waInput = document.getElementById('wa-number');
+      if (waInput) waInput.value = storeSettings.waNumber;
+      const waMsgInput = document.getElementById('wa-template-msg');
+      if (waMsgInput) waMsgInput.value = storeSettings.waMsg;
+    }
+
+    function saveWhatsAppSettings() {
+      const waVal = document.getElementById('wa-number').value.trim();
+      const waMsgVal = document.getElementById('wa-template-msg').value.trim();
+      if (!waVal) {
+        toast("⚠️ Sila masukkan nombor WhatsApp yang sah!");
+        return;
+      }
+      storeSettings.waNumber = waVal;
+      storeSettings.waMsg = waMsgVal;
+      localStorage.setItem('kda_digital_settings', JSON.stringify(storeSettings));
+      updateWaHeaderBtn();
+      toast("✅ Nombor WhatsApp Kedai Berjaya Ditukar!");
+    }
+
+    function savePaymentGatewaySettings() {
+      const provider = document.getElementById('pg-provider').value;
+      storeSettings.provider = provider;
+
+      if (provider === 'manual') {
+        storeSettings.bankName = document.getElementById('bank-name-input')?.value || storeSettings.bankName;
+        storeSettings.bankAcc = document.getElementById('bank-acc-input')?.value || storeSettings.bankAcc;
+        storeSettings.bankHolder = document.getElementById('bank-holder-input')?.value || storeSettings.bankHolder;
+        storeSettings.duitnow = document.getElementById('bank-qr-input')?.value || storeSettings.duitnow;
+      }
+
+      localStorage.setItem('kda_digital_settings', JSON.stringify(storeSettings));
+      toast("✅ Tetapan Pembayaran Berjaya Disimpan!");
+    }
+
+    function renderPgFields() {
+      const val = document.getElementById('pg-provider').value;
+      const container = document.getElementById('pg-fields');
+      if (val === 'direct_link') {
+        container.innerHTML = `
+          <div class="bg-emerald-50 p-3.5 rounded-2xl border border-emerald-200 text-xs text-emerald-900 space-y-1">
+            <span class="font-bold block">✨ Direct Gateway Mode Aktif</span>
+            <p class="text-[11px] leading-relaxed">
+              Anda boleh memasukkan <strong>Pautan Direct Bil (ToyyibPay / Billplz Link)</strong> untuk setiap produk terus di borang 'Tambah / Edit Produk'. Pembeli yang menekan butang <strong>⚡ Beli</strong> akan dibawa ke gerbang pembayaran pilihan anda secara automatik!
+            </p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <div class="space-y-2 bg-slate-50 p-3 rounded-2xl border">
+            <div><label class="block text-xs font-bold mb-1">Nama Bank / Entiti Penjual</label><input type="text" id="bank-name-input" value="${storeSettings.bankName || ''}" placeholder="Maybank Berhad" class="w-full border p-2.5 rounded-xl text-xs bg-white"></div>
+            <div><label class="block text-xs font-bold mb-1">Nombor Akaun Bank Penjual</label><input type="text" id="bank-acc-input" value="${storeSettings.bankAcc || ''}" placeholder="564012345678" class="w-full border p-2.5 rounded-xl text-xs bg-white font-mono"></div>
+            <div><label class="block text-xs font-bold mb-1">Nama Pemegang Akaun Penjual</label><input type="text" id="bank-holder-input" value="${storeSettings.bankHolder || ''}" placeholder="Kedai Digital Studio Enterprise" class="w-full border p-2.5 rounded-xl text-xs bg-white"></div>
+            <div><label class="block text-xs font-bold mb-1">Nombor Telefon DuitNow QR Penjual</label><input type="text" id="bank-qr-input" value="${storeSettings.duitnow || ''}" placeholder="60123456789" class="w-full border p-2.5 rounded-xl text-xs bg-white font-mono"></div>
+          </div>
+        `;
+      }
+    }
+
+    // PENUKAR TEMA WARNA & LATAR BELAKANG
+    function applyThemeStyle(theme) {
+      storeSettings.themeStyle = theme;
+      const body = document.getElementById('app-body');
+      const g1 = document.getElementById('glow-circle-1');
+      const g2 = document.getElementById('glow-circle-2');
+      const g3 = document.getElementById('glow-circle-3');
+      const hero = document.getElementById('hero-banner');
+
+      if (theme === 'theme-emerald') {
+        body.className = "bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between antialiased selection:bg-emerald-500 selection:text-white relative overflow-x-hidden";
+        g1.className = "absolute -top-40 left-1/2 -translate-x-1/2 w-[45rem] h-[28rem] bg-gradient-to-tr from-emerald-500/15 via-teal-500/15 to-emerald-500/10 blur-3xl rounded-full";
+        g2.className = "absolute top-[35%] -left-36 w-[30rem] h-[30rem] bg-emerald-500/10 blur-3xl rounded-full";
+        g3.className = "absolute top-[65%] -right-36 w-[32rem] h-[32rem] bg-teal-500/10 blur-3xl rounded-full";
+        hero.className = "relative overflow-hidden bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 text-white rounded-3xl p-6 sm:p-12 shadow-2xl border border-emerald-600/30";
+      } else if (theme === 'theme-rose') {
+        body.className = "bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between antialiased selection:bg-rose-500 selection:text-white relative overflow-x-hidden";
+        g1.className = "absolute -top-40 left-1/2 -translate-x-1/2 w-[45rem] h-[28rem] bg-gradient-to-tr from-rose-500/15 via-pink-500/15 to-amber-500/10 blur-3xl rounded-full";
+        g2.className = "absolute top-[35%] -left-36 w-[30rem] h-[30rem] bg-rose-500/10 blur-3xl rounded-full";
+        g3.className = "absolute top-[65%] -right-36 w-[32rem] h-[32rem] bg-orange-500/10 blur-3xl rounded-full";
+        hero.className = "relative overflow-hidden bg-gradient-to-br from-slate-900 via-rose-950 to-purple-950 text-white rounded-3xl p-6 sm:p-12 shadow-2xl border border-rose-600/30";
+      } else if (theme === 'theme-dark') {
+        body.className = "bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white relative overflow-x-hidden";
+        g1.className = "absolute -top-40 left-1/2 -translate-x-1/2 w-[45rem] h-[28rem] bg-gradient-to-tr from-indigo-500/20 via-violet-500/20 to-blue-500/15 blur-3xl rounded-full";
+        g2.className = "absolute top-[35%] -left-36 w-[30rem] h-[30rem] bg-indigo-500/15 blur-3xl rounded-full";
+        g3.className = "absolute top-[65%] -right-36 w-[32rem] h-[32rem] bg-purple-500/15 blur-3xl rounded-full";
+        hero.className = "relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white rounded-3xl p-6 sm:p-12 shadow-2xl border border-indigo-500/30";
+      } else {
+        // Indigo Modern
+        body.className = "bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white relative overflow-x-hidden";
+        g1.className = "absolute -top-40 left-1/2 -translate-x-1/2 w-[45rem] h-[28rem] bg-gradient-to-tr from-indigo-500/15 via-violet-500/15 to-pink-500/10 blur-3xl rounded-full";
+        g2.className = "absolute top-[35%] -left-36 w-[30rem] h-[30rem] bg-indigo-500/10 blur-3xl rounded-full";
+        g3.className = "absolute top-[65%] -right-36 w-[32rem] h-[32rem] bg-purple-500/10 blur-3xl rounded-full";
+        hero.className = "relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-indigo-900 text-white rounded-3xl p-6 sm:p-12 shadow-2xl border border-indigo-700/40";
+      }
+    }
+
+    // UPDATE DOM STOREFRONT DENGAN DATA SETTINGS
+    function updateStorefrontDOM() {
+      if (document.getElementById('brand-header-title')) document.getElementById('brand-header-title').innerText = storeSettings.siteName || 'Kedai Digital Studio';
+      if (document.getElementById('brand-header-tagline')) document.getElementById('brand-header-tagline').innerText = storeSettings.siteTagline || 'Pasaran Produk Digital & Templat Terbaik';
+      if (document.getElementById('buyer-promo-text')) document.getElementById('buyer-promo-text').innerText = storeSettings.promoText || '';
+      if (document.getElementById('store-badge-tag')) document.getElementById('store-badge-tag').innerHTML = `<span>⚡</span> <span>${storeSettings.heroBadge || 'Instant Download'}</span>`;
+      if (document.getElementById('store-hero-title')) document.getElementById('store-hero-title').innerText = storeSettings.heroTitle || '';
+      if (document.getElementById('store-hero-tagline')) document.getElementById('store-hero-tagline').innerText = storeSettings.heroDesc || '';
+      if (document.getElementById('stat-rating-val')) document.getElementById('stat-rating-val').innerText = storeSettings.statRating || '4.9 / 5.0';
+      if (document.getElementById('stat-downloads-val')) document.getElementById('stat-downloads-val').innerText = storeSettings.statDownloads || '3,800+';
+      if (document.getElementById('stat-satisfaction-val')) document.getElementById('stat-satisfaction-val').innerText = storeSettings.statSatisfaction || '99.8%';
+
+      // Form inputs synchronization
+      if (document.getElementById('site-name')) document.getElementById('site-name').value = storeSettings.siteName;
+      if (document.getElementById('site-tagline')) document.getElementById('site-tagline').value = storeSettings.siteTagline;
+      if (document.getElementById('promo-text-input')) document.getElementById('promo-text-input').value = storeSettings.promoText;
+      if (document.getElementById('hero-badge-input')) document.getElementById('hero-badge-input').value = storeSettings.heroBadge;
+      if (document.getElementById('hero-title-input')) document.getElementById('hero-title-input').value = storeSettings.heroTitle;
+      if (document.getElementById('hero-desc-input')) document.getElementById('hero-desc-input').value = storeSettings.heroDesc;
+      if (document.getElementById('stat-rating-input')) document.getElementById('stat-rating-input').value = storeSettings.statRating;
+      if (document.getElementById('stat-downloads-input')) document.getElementById('stat-downloads-input').value = storeSettings.statDownloads;
+      if (document.getElementById('stat-satisfaction-input')) document.getElementById('stat-satisfaction-input').value = storeSettings.statSatisfaction;
+
+      // Radio button selection
+      const radio = document.querySelector(`input[name="theme-radio"][value="${storeSettings.themeStyle}"]`);
+      if (radio) radio.checked = true;
+
+      // Populate Testimonials inputs
+      if (storeSettings.testimonials && storeSettings.testimonials.length >= 3) {
+        document.getElementById('t-name-1').value = storeSettings.testimonials[0].name;
+        document.getElementById('t-role-1').value = storeSettings.testimonials[0].role;
+        document.getElementById('t-text-1').value = storeSettings.testimonials[0].text;
+
+        document.getElementById('t-name-2').value = storeSettings.testimonials[1].name;
+        document.getElementById('t-role-2').value = storeSettings.testimonials[1].role;
+        document.getElementById('t-text-2').value = storeSettings.testimonials[1].text;
+
+        document.getElementById('t-name-3').value = storeSettings.testimonials[2].name;
+        document.getElementById('t-role-3').value = storeSettings.testimonials[2].role;
+        document.getElementById('t-text-3').value = storeSettings.testimonials[2].text;
+      }
+
+      renderTestimonials();
+    }
+
+    // RENDERING TESTIMONI PELANGGAN
+    function renderTestimonials() {
+      const container = document.getElementById('testimonials-grid');
+      if (!container) return;
+
+      const list = storeSettings.testimonials || [];
+      container.innerHTML = list.map(t => `
+        <div class="glass-card p-5 rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 hover:-translate-y-1">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1 text-amber-400 text-sm">
+                <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+              </div>
+              <span class="inline-flex items-center gap-1 text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <span>✓</span> Disahkan
+              </span>
+            </div>
+            <p class="text-xs text-slate-600 leading-relaxed italic">
+              "${t.text}"
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3 pt-3 border-t border-slate-100">
+            <img src="${t.avatar || 'https://placehold.co/100x100/e2e8f0/475569?text=User'}" class="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-xs" onerror="this.src='https://placehold.co/100x100/e2e8f0/475569?text=User'">
+            <div>
+              <h5 class="text-xs font-bold text-slate-900">${t.name}</h5>
+              <p class="text-[10px] text-slate-400">${t.role}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // SIMPAN TETAPAN TESTIMONI
+    function saveTestimonialSettings() {
+      storeSettings.testimonials = [
+        {
+          name: document.getElementById('t-name-1').value.trim() || 'Pembeli Rahsia',
+          role: document.getElementById('t-role-1').value.trim() || 'Pengguna Digital',
+          text: document.getElementById('t-text-1').value.trim() || 'Produk sangat berkualiti!',
+          stars: 5,
+          avatar: storeSettings.testimonials[0]?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'
+        },
+        {
+          name: document.getElementById('t-name-2').value.trim() || 'Pembeli Rahsia',
+          role: document.getElementById('t-role-2').value.trim() || 'Pengguna Digital',
+          text: document.getElementById('t-text-2').value.trim() || 'Sangat memudahkan urusan!',
+          stars: 5,
+          avatar: storeSettings.testimonials[1]?.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150'
+        },
+        {
+          name: document.getElementById('t-name-3').value.trim() || 'Pembeli Rahsia',
+          role: document.getElementById('t-role-3').value.trim() || 'Pengguna Digital',
+          text: document.getElementById('t-text-3').value.trim() || 'Terima kasih atas perkongsian bahan terbaik!',
+          stars: 5,
+          avatar: storeSettings.testimonials[2]?.avatar || 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150'
+        }
+      ];
+
+      localStorage.setItem('kda_digital_settings', JSON.stringify(storeSettings));
+      renderTestimonials();
+      toast("⭐ Maklumat 3 Testimoni berjaya dikemaskini!");
+    }
+
+    // SIMPAN STOREFRONT SETTINGS DARI EDITOR
+    function applyStorefrontSettings() {
+      const selectedTheme = document.querySelector('input[name="theme-radio"]:checked')?.value || 'theme-indigo';
+
+      storeSettings.themeStyle = selectedTheme;
+      storeSettings.siteName = document.getElementById('site-name').value.trim();
+      storeSettings.siteTagline = document.getElementById('site-tagline').value.trim();
+      storeSettings.promoText = document.getElementById('promo-text-input').value.trim();
+      storeSettings.heroBadge = document.getElementById('hero-badge-input').value.trim();
+      storeSettings.heroTitle = document.getElementById('hero-title-input').value.trim();
+      storeSettings.heroDesc = document.getElementById('hero-desc-input').value.trim();
+      storeSettings.statRating = document.getElementById('stat-rating-input').value.trim();
+      storeSettings.statDownloads = document.getElementById('stat-downloads-input').value.trim();
+      storeSettings.statSatisfaction = document.getElementById('stat-satisfaction-input').value.trim();
+
+      localStorage.setItem('kda_digital_settings', JSON.stringify(storeSettings));
+      
+      applyThemeStyle(selectedTheme);
+      updateStorefrontDOM();
+      
+      toast("🎨 Tema & Rekabentuk Kedai Berjaya Disimpan!");
+      closeSettingsModal();
+    }
+
+    // RENDERING KATALOG PEMBELI DENGAN REKABENTUK KAD MODEN
+    function renderBuyerProducts(list = productsList) {
+      const container = document.getElementById('buyer-products-grid');
+      let filtered = list;
+
+      if (activeCategory !== 'all') {
+        filtered = filtered.filter(p => p.category === activeCategory);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400 text-xs">Tiada produk digital dalam kategori ini buat masa sekarang.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(p => `
+        <div class="glass-card rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group hover:-translate-y-1">
+          <div>
+            <div class="relative overflow-hidden h-44 bg-slate-100">
+              <img src="${p.image_url}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/400x300/e2e8f0/64748b?text=Fail+Digital'">
+              <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-xs">
+                ${p.category === 'ebook' ? '📚 Ebook' : p.category === 'canva' ? '🎨 Canva' : '✨ Digital Kit'}
+              </span>
+            </div>
+
+            <div class="p-4 space-y-2">
+              <div class="flex items-center gap-1 text-amber-400 text-xs font-bold">
+                <span>⭐⭐⭐⭐⭐</span>
+                <span class="text-slate-400 text-[10px] font-normal ml-1">(5.0)</span>
+              </div>
+              <h4 class="font-bold text-xs sm:text-sm text-slate-900 line-clamp-2 leading-snug group-hover:text-indigo-600 transition-colors">${p.title}</h4>
+              <p class="text-[11px] text-slate-500 line-clamp-2">${p.description}</p>
+            </div>
+          </div>
+
+          <div class="p-4 pt-0 flex items-center justify-between mt-2 border-t border-slate-100">
+            <div>
+              <span class="text-[10px] text-slate-400 block line-through">RM ${(parseFloat(p.price) * 1.5).toFixed(2)}</span>
+              <span class="text-sm sm:text-base font-black text-indigo-700">RM ${parseFloat(p.price).toFixed(2)}</span>
+            </div>
+            <button onclick="buyProduct(${p.id})" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all shadow-md shadow-indigo-200 flex items-center gap-1.5 hover:scale-105">
+              <span>⚡</span> Beli Segera
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterCategory(cat, btnEl) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-xs');
+        btn.classList.add('bg-white', 'text-slate-600', 'border');
+      });
+
+      if (btnEl) {
+        btnEl.classList.remove('bg-white', 'text-slate-600', 'border');
+        btnEl.classList.add('bg-indigo-600', 'text-white', 'shadow-xs');
+      }
+
+      filterBuyerProducts();
+    }
+
+    function filterBuyerProducts() {
+      const query = document.getElementById('buyer-search-input').value.toLowerCase();
+      const filtered = productsList.filter(p => p.title.toLowerCase().includes(query) || p.description.toLowerCase().includes(query));
+      renderBuyerProducts(filtered);
+    }
+
+    // RENDERING SENARAI PRODUK PENJUAL (DENGAN BUTANG EDIT & PADAM)
+    function renderSellerProducts() {
+      const container = document.getElementById('seller-products-list');
+      if (productsList.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Belum ada produk dimuat naik.</p>`;
+        return;
+      }
+
+      container.innerHTML = productsList.map(p => `
+        <div class="flex items-center justify-between p-3.5 bg-slate-50 border rounded-2xl gap-3">
+          <div class="flex items-center gap-3">
+            <img src="${p.image_url}" class="w-12 h-12 rounded-xl object-cover bg-slate-200" onerror="this.src='https://placehold.co/400x300/e2e8f0/64748b?text=Fail'">
+            <div>
+              <h5 class="font-bold text-xs text-slate-900">${p.title}</h5>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="text-[11px] text-indigo-600 font-bold">RM ${parseFloat(p.price).toFixed(2)}</span>
+                <span class="text-[9px] bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded-full uppercase">${p.category || 'digital'}</span>
+                ${p.payment_link ? '<span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">🔗 Direct FPX Link</span>' : ''}
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="editProduct(${p.id})" class="bg-amber-100 text-amber-800 hover:bg-amber-200 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1">
+              ✏️ Edit
+            </button>
+            <button onclick="deleteProduct(${p.id})" class="bg-rose-100 text-rose-700 hover:bg-rose-200 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1">
+              🗑️ Padam
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // TAMBAH / EDIT PRODUK DIGITAL
+    function handleProductUpload(e) {
+      e.preventDefault();
+      const editId = document.getElementById('p-edit-id').value;
+      const title = document.getElementById('p-title').value.trim();
+      const category = document.getElementById('p-category').value;
+      const price = parseFloat(document.getElementById('p-price').value);
+      const payLink = document.getElementById('p-payment-link').value.trim();
+      const desc = document.getElementById('p-desc').value.trim();
+      const imgFile = document.getElementById('p-image').files[0];
+      const docFile = document.getElementById('p-file').files[0];
+
+      if (!title || isNaN(price)) {
+        toast("⚠️ Sila isi tajuk dan harga produk!");
+        return;
+      }
+
+      if (editId) {
+        // MOD EDIT PRODUK SEDIA ADA
+        const prodIndex = productsList.findIndex(p => p.id == editId);
+        if (prodIndex !== -1) {
+          productsList[prodIndex].title = title;
+          productsList[prodIndex].category = category;
+          productsList[prodIndex].price = price;
+          productsList[prodIndex].payment_link = payLink;
+          productsList[prodIndex].description = desc || 'Tiada penerangan.';
+
+          if (imgFile) productsList[prodIndex].image_url = URL.createObjectURL(imgFile);
+          if (docFile) productsList[prodIndex].file_url = URL.createObjectURL(docFile);
+
+          localStorage.setItem('kda_digital_products', JSON.stringify(productsList));
+          toast("✏️ Produk berjaya dikemaskini!");
+        }
+      } else {
+        // MOD TAMBAH PRODUK BARU
+        let imgUrl = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500';
+        let docUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
+
+        if (imgFile) imgUrl = URL.createObjectURL(imgFile);
+        if (docFile) docUrl = URL.createObjectURL(docFile);
+
+        const newProd = {
+          id: Date.now(),
+          title: title,
+          category: category,
+          price: price,
+          payment_link: payLink,
+          description: desc || 'Tiada penerangan.',
+          image_url: imgUrl,
+          file_url: docUrl
+        };
+
+        productsList.unshift(newProd);
+        localStorage.setItem('kda_digital_products', JSON.stringify(productsList));
+        toast("✅ Produk digital berjaya ditambah!");
+      }
+
+      resetProductForm();
+      renderSellerProducts();
+    }
+
+    // BORANG EDIT PRODUK
+    function editProduct(id) {
+      const p = productsList.find(item => item.id === id);
+      if (!p) return;
+
+      document.getElementById('p-edit-id').value = p.id;
+      document.getElementById('p-title').value = p.title;
+      document.getElementById('p-category').value = p.category || 'ebook';
+      document.getElementById('p-price').value = p.price;
+      document.getElementById('p-payment-link').value = p.payment_link || '';
+      document.getElementById('p-desc').value = p.description;
+
+      document.getElementById('form-header-title').innerHTML = `<span>✏️</span> Edit Produk Digital`;
+      document.getElementById('form-badge').innerText = `Mod Edit`;
+      document.getElementById('form-badge').className = `text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded`;
+      document.getElementById('submit-btn').innerText = `💾 Kemaskini Maklumat Produk`;
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+
+      document.getElementById('p-image-hint').classList.remove('hidden');
+      document.getElementById('p-file-hint').classList.remove('hidden');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetProductForm() {
+      document.getElementById('upload-form').reset();
+      document.getElementById('p-edit-id').value = '';
+      document.getElementById('p-payment-link').value = '';
+      document.getElementById('form-header-title').innerHTML = `<span>➕</span> Tambah Produk Digital`;
+      document.getElementById('form-badge').innerText = `Borang Baru`;
+      document.getElementById('form-badge').className = `text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded`;
+      document.getElementById('submit-btn').innerText = `🚀 Muat Naik Produk Ke Storefront`;
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
+
+      document.getElementById('p-image-hint').classList.add('hidden');
+      document.getElementById('p-file-hint').classList.add('hidden');
+    }
+
+    function deleteProduct(id) {
+      productsList = productsList.filter(p => p.id !== id);
+      localStorage.setItem('kda_digital_products', JSON.stringify(productsList));
+      renderSellerProducts();
+      toast("🗑️ Produk berjaya dipadam!");
+    }
+
+    // PROSES CHECKOUT PEMBELIAN & PINDAHAN BANK DIRECT
+    function buyProduct(productId) {
+      const product = productsList.find(p => p.id === productId);
+      if (!product) return;
+
+      activeCheckoutProduct = product;
+
+      // JIKA PRODUK MEMPUNYAI DIRECT PAYMENT LINK (TOYYIBPAY / BILLPLZ)
+      if (product.payment_link && product.payment_link.startsWith('http')) {
+        toast("🚀 Membawa anda terus ke FPX Direct Online Banking...");
+        setTimeout(() => {
+          window.open(product.payment_link, '_blank');
+        }, 500);
+        return;
+      }
+
+      // JIKA TIADA DIRECT LINK, BUKA MODAL MANUAL/STANDARD CHECKOUT
+      document.getElementById('demo-product-title').innerText = product.title;
+      document.getElementById('demo-product-price').innerText = `RM ${parseFloat(product.price).toFixed(2)}`;
+
+      const downloadBtn = document.getElementById('demo-download-link');
+      downloadBtn.href = product.file_url || '#';
+      document.getElementById('demo-download-text').innerText = `Muat Turun "${product.title}"`;
+
+      // Kemaskini Info Akaun Bank Penjual dalam Checkout
+      document.getElementById('checkout-seller-bank-info').innerText = `${storeSettings.bankName || 'Maybank'}: ${storeSettings.bankAcc || '564012345678'} (${storeSettings.bankHolder || 'Kedai Digital Studio'})`;
+      document.getElementById('checkout-seller-qr-info').innerText = storeSettings.duitnow || storeSettings.waNumber;
+
+      document.getElementById('checkout-result-box').classList.add('hidden');
+      document.getElementById('checkout-actions').classList.remove('hidden');
+      document.getElementById('checkout-buyer-name').value = '';
+      document.getElementById('checkout-buyer-email').value = '';
+      document.getElementById('checkout-bank-select').selectedIndex = 0;
+
+      document.getElementById('demo-modal').classList.remove('hidden');
+    }
+
+    function processCheckoutPayment() {
+      const name = document.getElementById('checkout-buyer-name').value.trim();
+      const email = document.getElementById('checkout-buyer-email').value.trim();
+      const selectedBank = document.getElementById('checkout-bank-select').value;
+
+      if (!name || !email || !email.includes('@')) {
+        toast("⚠️ Sila masukkan Nama dan Emel yang sah untuk menerima fail!");
+        return;
+      }
+
+      if (!selectedBank) {
+        toast("⚠️ Sila pilih salah satu daripada 8 Bank Malaysia yang disediakan!");
+        return;
+      }
+
+      const btn = document.getElementById('btn-process-payment');
+      btn.innerHTML = `<span>⏳</span> Memproses Transaksi ${selectedBank}...`;
+      btn.disabled = true;
+
+      setTimeout(() => {
+        btn.innerHTML = `<span>⚡</span> Bayar & Muat Turun Serta-Merta`;
+        btn.disabled = false;
+        
+        document.getElementById('email-confirmation-text').innerText = email;
+        document.getElementById('checkout-result-box').classList.remove('hidden');
+        document.getElementById('checkout-actions').classList.add('hidden');
+        toast(`✅ Pembayaran dari ${selectedBank} Berjaya! Fail sedia untuk dimuat turun.`);
+      }, 1000);
+    }
+
+    // MODAL & TABS TETAPAN
+    function openSettingsModal() {
+      document.getElementById('settings-modal').classList.remove('hidden');
+      renderPgFields();
+      initChart();
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    function closeDemoModal() {
+      document.getElementById('demo-modal').classList.add('hidden');
+    }
+
+    function switchTab(tabId, btnEl) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-indigo-600', 'border', 'shadow-xs');
+      });
+
+      const activeTab = document.getElementById(tabId);
+      if (activeTab) activeTab.classList.remove('hidden');
+
+      if (btnEl) {
+        btnEl.classList.add('bg-white', 'text-indigo-600', 'border', 'shadow-xs');
+      }
+    }
+
+    // UTILITI TOAST
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toast-text').innerText = msg;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 3500);
+    }
+
+    // GRAF ANALISIS
+    function initChart() {
+      const ctx = document.getElementById('salesChart');
+      if (!ctx) return;
+      if (salesChartInstance) salesChartInstance.destroy();
+
+      salesChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu', 'Ahad'],
+          datasets: [{
+            label: 'Jualan (RM)',
+            data: [120, 250, 180, 420, 310, 500, 650],
+            borderColor: '#4f46e5',
+            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    // RUN ON LOAD
+    window.onload = function() {
+      loadSavedSettings();
+      setMode('buyer');
+    };
+  </script>
+</body>
+</html>
